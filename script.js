@@ -1,61 +1,87 @@
 // Footer year
 document.getElementById('year').textContent = new Date().getFullYear();
 
-// Generate a small node network in the hero SVG — a nod to protein-surface
-// interaction graphs. Purely decorative, respects reduced-motion.
+// Contact form — submit via fetch so the person stays on the page
 (function () {
-  const svg = document.getElementById('network');
+  const form = document.getElementById('contact-form');
+  const status = document.getElementById('form-status');
+  if (!form) return;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    status.textContent = 'Sending…';
+    status.className = 'form-status';
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' }
+      });
+
+      if (response.ok) {
+        status.textContent = 'Message sent — thanks, I\'ll get back to you soon.';
+        status.className = 'form-status success';
+        form.reset();
+      } else {
+        status.textContent = 'Something went wrong. Please try again or email me directly.';
+        status.className = 'form-status error';
+      }
+    } catch (err) {
+      status.textContent = 'Something went wrong. Please try again or email me directly.';
+      status.className = 'form-status error';
+    } finally {
+      submitBtn.disabled = false;
+    }
+  });
+})();
+
+// Generate a cluster of colorful, gently overlapping circles in the hero
+// SVG — a nod to emulsion droplets, the actual subject of a lot of this
+// research. Purely decorative, respects reduced-motion.
+(function () {
+  const svg = document.getElementById('droplets');
   if (!svg) return;
 
   const W = 420, H = 420;
-  const N = 14;
-  const nodes = [];
+  const palette = ['#4B7A3D', '#E89A34', '#8C2F5C', '#6E9A5C', '#EFC17A'];
+  const droplets = [];
+  const N = 11;
 
   for (let i = 0; i < N; i++) {
-    nodes.push({
-      x: 40 + Math.random() * (W - 80),
-      y: 40 + Math.random() * (H - 80),
-      r: 3 + Math.random() * 4
+    droplets.push({
+      x: 90 + Math.random() * (W - 180),
+      y: 90 + Math.random() * (H - 180),
+      r: 22 + Math.random() * 55,
+      color: palette[i % palette.length],
+      delay: (Math.random() * 3).toFixed(2)
     });
   }
 
-  const edgesGroup = svg.querySelector('.edges');
-  const nodesGroup = svg.querySelector('.nodes');
+  // Largest circles first so smaller ones sit visually on top
+  droplets.sort((a, b) => b.r - a.r);
 
-  // Connect each node to its 2 nearest neighbors
-  nodes.forEach((n, i) => {
-    const dists = nodes
-      .map((m, j) => ({ j, d: (m.x - n.x) ** 2 + (m.y - n.y) ** 2 }))
-      .filter((o) => o.j !== i)
-      .sort((a, b) => a.d - b.d)
-      .slice(0, 2);
-
-    dists.forEach(({ j }) => {
-      const m = nodes[j];
-      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', n.x);
-      line.setAttribute('y1', n.y);
-      line.setAttribute('x2', m.x);
-      line.setAttribute('y2', m.y);
-      edgesGroup.appendChild(line);
-    });
-  });
-
-  nodes.forEach((n, i) => {
+  droplets.forEach((d) => {
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttribute('cx', n.x);
-    circle.setAttribute('cy', n.y);
-    circle.setAttribute('r', n.r);
-    circle.style.animation = `pulse 3.5s ease-in-out ${(i * 0.15).toFixed(2)}s infinite`;
-    nodesGroup.appendChild(circle);
+    circle.setAttribute('cx', d.x);
+    circle.setAttribute('cy', d.y);
+    circle.setAttribute('r', d.r);
+    circle.setAttribute('fill', d.color);
+    circle.setAttribute('opacity', '0.82');
+    circle.style.mixBlendMode = 'multiply';
+    circle.style.animation = `float 6s ease-in-out ${d.delay}s infinite`;
+    svg.appendChild(circle);
   });
 
   const style = document.createElement('style');
   style.textContent = `
-    @keyframes pulse {
-      0%, 100% { opacity: 0.75; }
-      50% { opacity: 1; }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(0, -8px); }
     }
+    #droplets circle { transform-box: fill-box; transform-origin: center; }
   `;
   document.head.appendChild(style);
 })();
