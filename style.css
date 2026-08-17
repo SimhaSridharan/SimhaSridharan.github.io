@@ -67,9 +67,12 @@ a:focus-visible, button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
   padding-top: 16px;
   padding-bottom: 16px;
 }
+.header-right { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
 .mark {
   font-family: 'Bricolage Grotesque', sans-serif;
   font-weight: 700;
@@ -85,6 +88,7 @@ a:focus-visible, button:focus-visible {
   font-family: 'JetBrains Mono', monospace;
 }
 .site-header nav a:hover { color: var(--pea-dark); }
+.site-header nav a.active { color: var(--pea-dark); font-weight: 600; }
 
 /* Hero */
 .hero {
@@ -260,12 +264,41 @@ h1 {
 }
 .contact-links a:hover { border-color: var(--pea); }
 
+/* Social icons */
+.social-icons { display: flex; gap: 10px; align-items: center; }
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: #fff;
+  flex-shrink: 0;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.social-icon svg { width: 19px; height: 19px; }
+.social-icon:hover { transform: translateY(-2px); opacity: 0.88; }
+.social-icon:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.social-github { background: var(--ink); }
+.social-scholar { background: var(--pea); }
+.social-linkedin { background: var(--plum); }
+
+.footer-socials { display: flex; justify-content: center; gap: 14px; margin: 0 0 16px; }
+.footer-socials .social-icon { width: 44px; height: 44px; }
+.footer-socials .social-icon svg { width: 22px; height: 22px; }
+
+.contact-socials { display: flex; gap: 16px; margin-top: 6px; }
+.contact-socials .social-icon { width: 56px; height: 56px; }
+.contact-socials .social-icon svg { width: 27px; height: 27px; }
+
 /* Footer */
 .site-footer {
   padding: 28px 24px 48px;
   color: var(--ink-soft);
   font-size: 0.85rem;
   font-family: 'JetBrains Mono', monospace;
+  text-align: center;
 }
 
 /* Responsive */
@@ -275,4 +308,6 @@ h1 {
   .cards { grid-template-columns: 1fr; }
   .site-header nav { gap: 14px; }
   .site-header nav a { font-size: 0.82rem; }
+  .header-right .social-icon { width: 32px; height: 32px; }
+  .header-right .social-icon svg { width: 16px; height: 16px; }
 }
